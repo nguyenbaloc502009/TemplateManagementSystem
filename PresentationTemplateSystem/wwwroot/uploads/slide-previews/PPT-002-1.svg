@@ -1,0 +1,7 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <rect width="960" height="540" fill="#fff"/>
+  <rect width="960" height="16" fill="#008C95"/>
+  <text x="56" y="100" font-family="Arial,sans-serif" font-size="34" font-weight="700" fill="#008C95">BÁO CÁO TIẾN ĐỘ SPRINT REVIEW</text>
+  <text x="56" y="150" font-family="Arial,sans-serif" font-size="22" fill="#667085">Dự án Hệ thống Quản trị Mẫu Văn bản &amp;amp; Slide</text>
+  <text x="56" y="210" font-family="Arial,sans-serif" font-size="18" fill="#344054">Sprint: 14 | Kỳ đánh giá: Tuần 44/2026\nTech Lead: Nguyễn Bá Lộc\nTeam: Web Platform &amp;amp; Core Services</text>
+</svg>

@@ -1,0 +1,7 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <rect width="960" height="540" fill="#fff"/>
+  <rect width="960" height="16" fill="#008C95"/>
+  <text x="56" y="100" font-family="Arial,sans-serif" font-size="34" font-weight="700" fill="#008C95">KẾT QUẢ CÔNG VIỆC TRONG SPRINT</text>
+  <text x="56" y="150" font-family="Arial,sans-serif" font-size="22" fill="#667085">Mức độ hoàn thành các Story Points cam kết</text>
+  <text x="56" y="210" font-family="Arial,sans-serif" font-size="18" fill="#344054">• [Hoàn thành 100%] Khởi tạo CSDL PostgreSQL và các Store SQL Parameterized.\n• [Hoàn thành 100%] Xây dựng RESTful API cho cả 2 sản phẩm văn bản và thuyết trình.\n• [Hoàn thành 100%] Trình soạn thảo văn bản và slide editor trực tuyến mượt mà.</text>
+</svg>

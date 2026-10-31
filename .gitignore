@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+**/storage/user/
+.vs/
+.idea/
+*.user
+*.suo
+*.log
+
+# Office files are stored in MinIO, not in the application source.
+DocumentTemplateSystem/storage/
+PresentationTemplateSystem/storage/

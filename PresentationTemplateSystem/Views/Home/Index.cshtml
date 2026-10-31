@@ -1,0 +1,63 @@
+@{
+    ViewData["Title"] = "Chào mừng";
+}
+
+<div class="container-fluid py-5 welcome-page">
+    <section class="welcome-hero bg-white border rounded-4 shadow-sm p-4 p-md-5 mb-4">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <span class="badge rounded-pill bg-warning-subtle text-dark px-3 py-2 mb-3">
+                    <i class="bi bi-stars me-1"></i> Không gian làm việc PowerPoint
+                </span>
+                <h1 class="display-5 fw-bold text-dark mb-3">Tạo bài thuyết trình dễ dàng hơn</h1>
+                <p class="lead text-muted mb-4">
+                    Chọn một mẫu phù hợp, tùy chỉnh nội dung theo nhu cầu và lưu lại để tiếp tục bất cứ lúc nào.
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a asp-controller="Presentation" asp-action="Index" class="btn btn-warning btn-lg fw-semibold">
+                        <i class="bi bi-collection me-2"></i>Khám phá thư viện mẫu
+                    </a>
+                    <a asp-controller="Presentation" asp-action="MyDecks" class="btn btn-outline-dark btn-lg">
+                        <i class="bi bi-folder2-open me-2"></i>Mở bài thuyết trình của tôi
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 d-none d-lg-flex justify-content-center">
+                <div class="welcome-icon text-warning" aria-hidden="true">
+                    <i class="bi bi-file-earmark-slides"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <a asp-controller="Presentation" asp-action="Index" class="welcome-action card h-100 border-0 shadow-sm text-decoration-none">
+                <div class="card-body d-flex align-items-start gap-3 p-4">
+                    <span class="welcome-action-icon bg-warning-subtle text-dark">
+                        <i class="bi bi-grid"></i>
+                    </span>
+                    <div>
+                        <h2 class="h5 fw-bold text-dark mb-2">Bắt đầu từ một mẫu</h2>
+                        <p class="text-muted mb-0">Duyệt các bộ slide, xem trước nội dung và tạo bản trình chiếu riêng.</p>
+                    </div>
+                    <i class="bi bi-arrow-right ms-auto text-muted"></i>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a asp-controller="Presentation" asp-action="MyDecks" class="welcome-action card h-100 border-0 shadow-sm text-decoration-none">
+                <div class="card-body d-flex align-items-start gap-3 p-4">
+                    <span class="welcome-action-icon bg-light text-primary">
+                        <i class="bi bi-folder2-open"></i>
+                    </span>
+                    <div>
+                        <h2 class="h5 fw-bold text-dark mb-2">Tiếp tục công việc</h2>
+                        <p class="text-muted mb-0">Mở lại bài thuyết trình đã tạo để chỉnh sửa hoặc tải xuống.</p>
+                    </div>
+                    <i class="bi bi-arrow-right ms-auto text-muted"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>

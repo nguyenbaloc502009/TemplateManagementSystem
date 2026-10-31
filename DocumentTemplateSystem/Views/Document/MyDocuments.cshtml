@@ -1,0 +1,110 @@
+@model List<DocumentTemplateSystem.Models.DB.DocUserDocumentEntity>
+@{
+    ViewData["Title"] = "Tài Liệu Của Tôi";
+}
+
+<div class="container-fluid px-lg-5 py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-folder-check text-success me-2"></i>Kho Tài Liệu Đã Khởi Tạo
+            </h2>
+            <p class="text-muted mb-0 small">
+                Danh sách các tài liệu được người dùng nhân bản và chỉnh sửa từ mẫu gốc. Các tài liệu này hoàn toàn độc lập với kho mẫu.
+            </p>
+        </div>
+        <div>
+            <a href="@Url.Action("Index", "Document")" class="btn btn-primary fw-medium">
+                <i class="bi bi-plus-lg me-1"></i> Tạo tài liệu mới từ mẫu
+            </a>
+        </div>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="card border-0 shadow-sm p-5 text-center my-4">
+            <div class="my-3">
+                <i class="bi bi-folder-x text-muted display-1 opacity-50"></i>
+            </div>
+            <h4 class="fw-bold text-dark">Bạn chưa tạo tài liệu nào!</h4>
+            <p class="text-muted">Hãy truy cập kho mẫu văn bản để chọn và khởi tạo tài liệu đầu tiên của bạn.</p>
+            <div class="mt-2">
+                <a href="@Url.Action("Index", "Document")" class="btn btn-primary px-4">
+                    <i class="bi bi-arrow-right me-1"></i> Đến kho mẫu văn bản
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 50px;" class="text-center">#</th>
+                            <th>Tên tài liệu</th>
+                            <th>Mẫu gốc</th>
+                            <th>Danh mục</th>
+                            <th>Người tạo</th>
+                            <th>Trạng thái</th>
+                            <th>Cập nhật lần cuối</th>
+                            <th class="text-end" style="width: 250px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            var item = Model[i];
+                            <tr>
+                                <td class="text-center text-muted">@(i + 1)</td>
+                                <td>
+                                    <a href="@Url.Action("Editor", "Document", new { id = item.Id })" class="fw-bold text-decoration-none text-dark">
+                                        <i class="bi bi-file-earmark-text text-primary me-1"></i> @item.DocumentTitle
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="text-muted small">@(item.TemplateTitle ?? "Mẫu tùy chỉnh")</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary-subtle text-secondary">
+                                        @(item.CategoryName ?? "Chung")
+                                    </span>
+                                </td>
+                                <td class="small">@item.AuthorName</td>
+                                <td>
+                                    @if (item.Status == "Saved")
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">Đã lưu</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Bản nháp</span>
+                                    }
+                                </td>
+                                <td class="small text-muted">@item.UpdatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="text-end">
+                                    <a href="@Url.Action("Editor", "Document", new { id = item.Id })" class="btn btn-outline-primary btn-sm me-1" title="Mở trình soạn thảo">
+                                        <i class="bi bi-pencil-fill"></i> Sửa
+                                    </a>
+                                    <a href="/api/DocTemplateApi/export-docx/@item.Id" class="btn btn-outline-success btn-sm me-1" title="Tải file Word .docx">
+                                        <i class="bi bi-download"></i> DOCX
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger btn-sm btn-delete-doc" data-id="@item.Id" data-title="@item.DocumentTitle" title="Xóa tài liệu">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/document-list.js" asp-append-version="true"></script>
+}
+

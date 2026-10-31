@@ -1,0 +1,10 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <rect width="640" height="360" rx="18" fill="#f7f9fc"/>
+  <rect width="640" height="18" rx="9" fill="#7030A0"/>
+  <rect x="44" y="58" width="552" height="244" rx="10" fill="#fff" stroke="#dce3ed" stroke-width="2"/>
+  <rect x="82" y="94" width="476" height="12" rx="6" fill="#7030A0" opacity=".18"/>
+  <text x="82" y="154" font-family="Arial,sans-serif" font-size="26" font-weight="700" fill="#25324a">Startup Investment Pitch Deck 2026</text>
+  <rect x="82" y="188" width="410" height="9" rx="4" fill="#dce3ed"/>
+  <rect x="82" y="212" width="350" height="9" rx="4" fill="#e8edf4"/>
+  <rect x="82" y="236" width="390" height="9" rx="4" fill="#e8edf4"/>
+</svg>

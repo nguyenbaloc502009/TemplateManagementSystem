@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Thư Viện Mẫu Văn Bản</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" asp-append-version="true" />
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+    <div class="d-none">@Html.AntiForgeryToken()</div>
+    <!-- Navbar Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
+        <div class="container-fluid px-lg-5">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" asp-controller="Document" asp-action="Index">
+                <i class="bi bi-file-earmark-word fs-3 text-white"></i>
+                <span class="fs-4">DocTemplate<span class="badge bg-warning text-dark ms-2 fs-6">Sản phẩm 1</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-medium">
+                    <li class="nav-item">
+                        <a class="nav-link active" asp-controller="Document" asp-action="Index">
+                            <i class="bi bi-grid-fill me-1"></i> Kho Mẫu Văn Bản
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Document" asp-action="MyDocuments">
+                            <i class="bi bi-folder-check me-1"></i> Tài Liệu Của Tôi
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center gap-2">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a asp-controller="Document" asp-action="Index" asp-route-openCreateTemplate="true" class="btn btn-warning fw-semibold shadow-sm">
+                            <i class="bi bi-plus-circle me-1"></i> Thêm Mẫu Mới
+                        </a>
+                    }
+                    <!-- Link chuyển sang Sản phẩm 2: Thư viện Mẫu Trình Chiếu -->
+                    <a href="http://localhost:5002" target="_blank" rel="noopener noreferrer" class="btn btn-outline-light d-flex align-items-center gap-1 shadow-sm">
+                        <i class="bi bi-easel2-fill text-warning"></i>
+                        <span>Sang Thư Viện Slide (SP 2)</span>
+                        <i class="bi bi-box-arrow-up-right small"></i>
+                    </a>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <span class="text-white small d-none d-xl-inline">@User.Identity.Name</span>
+                        <form asp-controller="Account" asp-action="Logout" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-light">Đăng xuất</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-light">Đăng nhập</a>
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-warning">Đăng ký</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Thông báo Toast / Alert -->
+    <div class="container-fluid px-lg-5 mt-3">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+    </div>
+
+    <!-- Main Content -->
+    <main role="main" class="flex-grow-1">
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-top py-3 mt-auto text-muted small">
+        <div class="container-fluid px-lg-5 d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <strong>Hệ Thống Thư Viện Mẫu Văn Bản &amp; Trình Chiếu</strong> &copy; 2026 - Template Management System
+            </div>
+            <div>
+                <span class="badge bg-secondary me-2">PostgreSQL 18</span>
+                <span class="badge bg-success">.NET 8.0 C#</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

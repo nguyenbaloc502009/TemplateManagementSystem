@@ -1,0 +1,7 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <rect width="960" height="540" fill="#fff"/>
+  <rect width="960" height="16" fill="#008C95"/>
+  <text x="56" y="100" font-family="Arial,sans-serif" font-size="34" font-weight="700" fill="#008C95">KIẾN TRÚC KỸ THUẬT &amp;amp; CÔNG NGHỆ</text>
+  <text x="56" y="150" font-family="Arial,sans-serif" font-size="22" fill="#667085">Mô hình 3 lớp phân tầng kế thừa chuẩn mực từ SyohinSystem</text>
+  <text x="56" y="210" font-family="Arial,sans-serif" font-size="18" fill="#344054">• Controller Layer: Kế thừa BaseApiController chuẩn hóa phản hồi JSON OkResponse.\n• Service &amp;amp; Data Layer: Độc lập logic, truy vấn SQL an toàn không SQL Injection.\n• Common Layer: PostgresDatabaseManager tối ưu hóa Connection Pool.</text>
+</svg>

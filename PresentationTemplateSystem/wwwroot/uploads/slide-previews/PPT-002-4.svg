@@ -1,0 +1,7 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <rect width="960" height="540" fill="#fff"/>
+  <rect width="960" height="16" fill="#008C95"/>
+  <text x="56" y="100" font-family="Arial,sans-serif" font-size="34" font-weight="700" fill="#008C95">KẾ HOẠCH BÀN GIAO &amp;amp; PHÁT HÀNH</text>
+  <text x="56" y="150" font-family="Arial,sans-serif" font-size="22" fill="#667085">Kế hoạch kiểm thử tải và bàn giao tài liệu kỹ thuật</text>
+  <text x="56" y="210" font-family="Arial,sans-serif" font-size="18" fill="#344054">• Đóng gói source code đầy đủ theo đúng chuẩn quy định.\n• Viết README hướng dẫn cài đặt và video quay thao tác màn hình.\n• Sẵn sàng cho buổi phỏng vấn chuyên sâu về thiết kế và kiến trúc.</text>
+</svg>

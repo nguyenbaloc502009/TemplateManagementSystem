@@ -1,0 +1,198 @@
+@model DocumentTemplateSystem.Models.ViewModels.DocEditorViewModel
+@{
+    ViewData["Title"] = "Soạn Thảo: " + Model.Document.DocumentTitle;
+}
+
+<div class="editor-page-wrapper bg-body-secondary py-3">
+    <!-- Header Thanh điều khiển trình soạn thảo -->
+    <div class="container-fluid px-lg-5 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-3">
+                <div class="row align-items-center">
+                    <!-- Tiêu đề tài liệu & Mẫu gốc -->
+                    <div class="col-lg-6">
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="@Url.Action("Index", "Document")" class="btn btn-outline-secondary btn-sm" title="Quay lại danh sách mẫu">
+                                <i class="bi bi-arrow-left"></i>
+                            </a>
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="hidden" id="documentId" value="@Model.Document.Id" />
+                                    <input type="text" id="docTitleInput" class="form-control form-control-sm fw-bold fs-6 border-0 bg-transparent p-0 text-primary" 
+                                           value="@Model.Document.DocumentTitle" title="Nhấp để đổi tiêu đề tài liệu" />
+                                    <span class="badge bg-secondary-subtle text-secondary small" id="statusBadge">
+                                        <i class="bi bi-clock me-1"></i>@Model.Document.Status
+                                    </span>
+                                </div>
+                                <div class="small text-muted">
+                                    Mẫu gốc: <strong class="text-dark">@(Model.OriginalTemplate?.Title ?? "Tài liệu tùy biến")</strong> 
+                                    <span class="badge bg-light text-success border ms-1"><i class="bi bi-shield-check"></i> Độc lập với template gốc</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nút thao tác Lưu & Tải xuống -->
+                    <div class="col-lg-6 text-lg-end mt-2 mt-lg-0 d-flex justify-content-lg-end gap-2 flex-wrap">
+                        <!-- Nút Lưu tài liệu vào DB -->
+                        <button type="button" class="btn btn-success fw-medium shadow-sm" id="btnSaveDoc">
+                            <i class="bi bi-floppy-fill me-1"></i> Lưu Tài Liệu
+                        </button>
+                        <!-- Nút Tải xuống file DOCX -->
+                        <a href="/api/DocTemplateApi/export-docx/@Model.Document.Id" class="btn btn-primary fw-medium shadow-sm" id="btnDownloadDocx">
+                            <i class="bi bi-file-earmark-word-fill me-1"></i> Tải Word (.docx)
+                        </a>
+                        <!-- Nút In hoặc Lưu PDF -->
+                        <button type="button" class="btn btn-outline-secondary fw-medium" onclick="window.print()">
+                            <i class="bi bi-printer me-1"></i> In / Xuất PDF
+                        </button>
+                        <!-- Danh sách tài liệu -->
+                        <a href="@Url.Action("MyDocuments", "Document")" class="btn btn-outline-dark fw-medium">
+                            <i class="bi bi-folder2-open me-1"></i> Kho tài liệu
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thanh công cụ Định dạng (Formatting Toolbar) -->
+    <div class="container-fluid px-lg-5 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-2 d-flex flex-wrap align-items-center gap-2">
+                <!-- Kiểu tiêu đề Heading -->
+                <div class="btn-group" role="group">
+                    <select class="form-select form-select-sm" id="headingSelect" onchange="formatDoc('formatBlock', this.value)" style="width: 140px;">
+                        <option value="p">Đoạn văn (Normal)</option>
+                        <option value="h1">Tiêu đề 1 (H1)</option>
+                        <option value="h2">Tiêu đề 2 (H2)</option>
+                        <option value="h3">Tiêu đề 3 (H3)</option>
+                    </select>
+                </div>
+
+                <div class="vr"></div>
+
+                <!-- Định dạng cơ bản: Bold, Italic, Underline, Strike -->
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-light btn-sm border" onclick="formatDoc('bold')" title="In đậm (Ctrl+B)">
+                        <i class="bi bi-type-bold fw-bold"></i>
+                    </button>
+                    <button type="button" class="btn btn-light btn-sm border" onclick="formatDoc('italic')" title="In nghiêng (Ctrl+I)">
+                        <i class="bi bi-type-italic"></i>
+                    </button>
+                    <button type="button" class="btn btn-light btn-sm border" onclick="formatDoc('underline')" title="Gạch chân (Ctrl+U)">
+                        <i class="bi bi-type-underline"></i>
+                    </button>
+                    <button type="button" class="btn btn-light btn-sm border" onclick="formatDoc('strikeThrough')" title="Gạch ngang">
+                        <i class="bi bi-type-strikethrough"></i>
+                    </button>
+                </div>
+
+                <div class="vr"></div>
+
+                <!-- Căn lề: Trái, Giữa, Phải, Đều -->
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-light btn-sm border" onclick="formatDoc('justifyLeft')" title="Căn trái">
+                        <i class="bi bi-text-left"></i>
+                    </button>
+                    <button type="button" class="btn btn-light btn-sm border" onclick="formatDoc('justifyCenter')" title="Căn giữa">
+                        <i class="bi bi-text-center"></i>
+                    </button>
+                    <button type="button" class="btn btn-light btn-sm border" onclick="formatDoc('justifyRight')" title="Căn phải">
+                        <i class="bi bi-text-right"></i>
+                    </button>
+                    <button type="button" class="btn btn-light btn-sm border" onclick="formatDoc('justifyFull')" title="Căn đều hai bên">
+                        <i class="bi bi-justify"></i>
+                    </button>
+                </div>
+
+                <div class="vr"></div>
+
+                <!-- Danh sách: Unordered & Ordered -->
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-light btn-sm border" onclick="formatDoc('insertUnorderedList')" title="Danh sách chấm">
+                        <i class="bi bi-list-ul"></i>
+                    </button>
+                    <button type="button" class="btn btn-light btn-sm border" onclick="formatDoc('insertOrderedList')" title="Danh sách số">
+                        <i class="bi bi-list-ol"></i>
+                    </button>
+                </div>
+
+                <div class="vr"></div>
+
+                <!-- Chèn bảng và đường kẻ ngang -->
+                <button type="button" class="btn btn-light btn-sm border" onclick="insertHorizontalRule()" title="Chèn đường kẻ ngang">
+                    <i class="bi bi-hr"></i>
+                </button>
+                <button type="button" class="btn btn-light btn-sm border" onclick="insertTable()" title="Chèn bảng biểu">
+                    <i class="bi bi-table"></i> Chèn Bảng
+                </button>
+
+                <div class="vr"></div>
+
+                <!-- Màu chữ -->
+                <div class="d-flex align-items-center gap-1">
+                    <label for="foreColorPicker" class="small text-muted"><i class="bi bi-palette"></i></label>
+                    <input type="color" id="foreColorPicker" onchange="formatDoc('foreColor', this.value)" title="Màu chữ" style="width: 32px; height: 30px; padding: 0; border: none; cursor: pointer;" value="#000000">
+                </div>
+
+                <div class="vr"></div>
+
+                <!-- Hỗ trợ điền nhanh các biến placeholder -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-code-slash me-1"></i> Chèn Biến
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><h6 class="dropdown-header">Chèn biến vào vị trí con trỏ:</h6></li>
+                        <li><a class="dropdown-item small" href="javascript:void(0)" onclick="insertPlaceholder('{{HoTen}}')">Họ và tên: {{HoTen}}</a></li>
+                        <li><a class="dropdown-item small" href="javascript:void(0)" onclick="insertPlaceholder('{{NgayThang}}')">Ngày tháng: {{NgayThang}}</a></li>
+                        <li><a class="dropdown-item small" href="javascript:void(0)" onclick="insertPlaceholder('{{TenCongTy}}')">Tên công ty: {{TenCongTy}}</a></li>
+                        <li><a class="dropdown-item small" href="javascript:void(0)" onclick="insertPlaceholder('{{ChucVu}}')">Chức vụ: {{ChucVu}}</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item small text-primary fw-medium" href="javascript:void(0)" onclick="autoReplaceDate()">Tự động điền ngày hôm nay</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tờ Giấy Soạn Thảo Khổ A4 (Trực quan & Chuẩn in ấn) -->
+    <div class="container-fluid px-lg-5 pb-5">
+        <div class="paper-editor-container mx-auto mb-2 small text-muted">
+            <i class="bi bi-info-circle me-1"></i>
+            Bấm vào biến màu xanh như <code>{{TenBoPhan}}</code> để điền nhanh; các vị trí cùng biến sẽ được thay thế cùng lúc.
+        </div>
+        <div class="paper-editor-container mx-auto">
+            <div id="editorContent" class="paper-page bg-white shadow p-5" contenteditable="true" spellcheck="false" data-doc-id="@Model.Document.Id">
+                @Html.Raw(Model.Document.ContentHtml)
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="placeholderModal" tabindex="-1" aria-labelledby="placeholderModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form id="placeholderForm">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="placeholderModalTitle">Điền thông tin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="placeholderValue" class="form-label" id="placeholderFieldLabel">Giá trị thay thế</label>
+                    <input type="text" class="form-control" id="placeholderValue" autocomplete="off" required />
+                    <div class="form-text" id="placeholderHelp">Giá trị sẽ thay thế tất cả vị trí có cùng biến trong tài liệu này.</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check2 me-1"></i>Thay thế</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/document-editor.js" asp-append-version="true"></script>
+}

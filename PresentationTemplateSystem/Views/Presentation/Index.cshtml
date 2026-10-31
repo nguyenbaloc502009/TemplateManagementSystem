@@ -1,0 +1,315 @@
+@model PresentationTemplateSystem.Models.ViewModels.PresentationListViewModel
+@{
+    ViewData["Title"] = "Thư Viện Mẫu Trình Chiếu PowerPoint";
+}
+
+<div class="container-fluid px-lg-5 py-4">
+    <!-- Hero Section -->
+    <div class="p-4 mb-4 bg-dark text-white rounded-3 shadow-sm border border-secondary border-opacity-25">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-6 fw-bold mb-2">
+                    <i class="bi bi-file-earmark-slides text-warning me-2"></i>Thư Viện Mẫu Trình Chiếu PowerPoint
+                </h1>
+                <p class="lead text-light text-opacity-75 mb-3 fs-6">
+                    Lựa chọn bộ slide thuyết trình chuyên nghiệp, xem trước chi tiết từng slide và khởi tạo bản trình chiếu riêng biệt. Hỗ trợ chỉnh sửa và tải xuống file PPTX nguyên bản tương thích Microsoft PowerPoint.
+                </p>
+                <div class="d-flex flex-wrap gap-2 align-items-center small">
+                    <span class="badge bg-warning text-dark px-3 py-2">
+                        <i class="bi bi-check2-circle me-1"></i> Tối thiểu 3 Bộ Template Chuẩn Đầy Đủ Slides
+                    </span>
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i class="bi bi-images me-1"></i> Slide Gallery Carousel Xem Trước Trực Quan
+                    </span>
+                    <span class="badge bg-primary px-3 py-2">
+                        <i class="bi bi-file-earmark-ppt-fill me-1"></i> Xuất File PPTX Chuẩn OpenXML
+                    </span>
+                </div>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <div class="card bg-secondary bg-opacity-25 border-0 p-3 text-start text-white">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-light text-opacity-75 small">Tổng số bộ slide:</span>
+                        <span class="fw-bold fs-5 text-warning">@Model.TotalCount</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-light text-opacity-75 small">CSDL lưu trữ:</span>
+                        <span class="badge bg-info text-dark">PostgreSQL 18 Real DB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thanh Tìm Kiếm & Lọc Danh Mục -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-3">
+            <form method="get" asp-action="Index" id="filterForm">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="bi bi-search text-muted"></i>
+                            </span>
+                            <input type="text" name="keyword" value="@Model.Keyword" class="form-control border-start-0" 
+                                   placeholder="Tìm theo tên bộ trình chiếu, chủ đề hoặc từ khóa..." />
+                            @if (!string.IsNullOrEmpty(Model.Keyword))
+                            {
+                                <a href="@Url.Action("Index", new { categoryId = Model.SelectedCategoryId })" class="btn btn-outline-secondary border-start-0" title="Xóa tìm kiếm">
+                                    <i class="bi bi-x-lg"></i>
+                                </a>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <select name="categoryId" class="form-select" onchange="this.form.submit()">
+                            <option value="">-- Tất cả phân loại (@Model.Categories.Count) --</option>
+                            @foreach (var cat in Model.Categories)
+                            {
+                                <option value="@cat.Id" selected="@(Model.SelectedCategoryId == cat.Id)">
+                                    @cat.Name
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 d-flex justify-content-end gap-2">
+                        <button type="submit" class="btn btn-warning px-4 fw-bold">
+                            <i class="bi bi-funnel-fill me-1"></i> Lọc
+                        </button>
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-counterclockwise"></i> Đặt lại
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Phân loại Pills -->
+                <div class="d-flex flex-wrap gap-2 mt-3 pt-2 border-top">
+                    <span class="small text-muted align-self-center me-1"><i class="bi bi-tags me-1"></i>Phân loại:</span>
+                    <a href="@Url.Action("Index", new { keyword = Model.Keyword })" 
+                       class="badge text-decoration-none px-3 py-2 @(Model.SelectedCategoryId == null ? "bg-warning text-dark fw-bold" : "bg-light text-dark border")">
+                        Tất cả
+                    </a>
+                    @foreach (var cat in Model.Categories)
+                    {
+                        <a href="@Url.Action("Index", new { categoryId = cat.Id, keyword = Model.Keyword })" 
+                           class="badge text-decoration-none px-3 py-2 @(Model.SelectedCategoryId == cat.Id ? "bg-warning text-dark fw-bold" : "bg-light text-dark border")">
+                            <i class="bi @cat.Icon me-1"></i>@cat.Name
+                        </a>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Danh Sách Bộ Mẫu Trình Chiếu (Grid) -->
+    @if (Model.Templates.Count == 0)
+    {
+        <div class="card border-0 shadow-sm p-5 text-center my-4">
+            <div class="my-3">
+                <i class="bi bi-easel2 text-muted display-1 opacity-50"></i>
+            </div>
+            <h4 class="fw-bold text-dark">Không tìm thấy bộ template trình chiếu nào!</h4>
+            <p class="text-muted">Vui lòng thử tìm với từ khóa khác hoặc xóa bộ lọc.</p>
+            <div class="mt-2">
+                <a href="@Url.Action("Index")" class="btn btn-outline-warning text-dark fw-medium">
+                    <i class="bi bi-arrow-left me-1"></i> Xem tất cả mẫu
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var item in Model.Templates)
+            {
+                <div class="col-md-6 col-xl-4 d-flex align-items-stretch">
+                    <div class="card deck-card h-100 w-100 shadow-sm border-0 rounded-3 overflow-hidden position-relative">
+                        <!-- Thumbnail Header tỷ lệ 16:9 phong cách PowerPoint -->
+                        <div class="deck-thumbnail-wrapper position-relative text-center d-flex flex-column justify-content-center p-4">
+                            <img class="img-fluid rounded shadow-sm" src="@item.ThumbnailUrl" alt="Ảnh xem trước @item.Title" loading="lazy"
+                                 onerror="this.onerror=null;this.src='/uploads/thumbnails/presentation-thumbnail-fallback.svg';" />
+                            <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 shadow-sm fw-bold">
+                                @item.CategoryName
+                            </span>
+                            <span class="badge bg-dark position-absolute top-0 end-0 m-3 shadow-sm">
+                                <i class="bi bi-layers-fill text-warning me-1"></i>@item.TotalSlides Slides
+                            </span>
+                            <div class="mt-2">
+                                <span class="badge bg-dark bg-opacity-50 small text-white">
+                                    <i class="bi bi-download me-1"></i>@item.UsageCount lượt dùng
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="card-body d-flex flex-column p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge bg-secondary-subtle text-secondary small">Mã: @item.Code</span>
+                            </div>
+                            <h5 class="card-title fw-bold text-dark mb-2 line-clamp-2" title="@item.Title">
+                                @item.Title
+                            </h5>
+                            <p class="card-text text-muted small flex-grow-1 line-clamp-3 mb-3">
+                                @item.Description
+                            </p>
+
+                            <!-- Tags -->
+                            @if (!string.IsNullOrEmpty(item.Tags))
+                            {
+                                <div class="mb-3">
+                                    @foreach (var tag in item.Tags.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries).Take(3))
+                                    {
+                                        <span class="badge bg-light text-dark border me-1 small">#@tag.Trim()</span>
+                                    }
+                                </div>
+                            }
+
+                            <!-- Card Action Buttons -->
+                            <div class="d-grid gap-2 pt-3 border-top">
+                                <!-- Nút Xem trước bộ slide (Slide Gallery Modal) -->
+                                <button type="button" class="btn btn-outline-dark btn-sm fw-medium btn-preview-deck" 
+                                        data-id="@item.Id" data-title="@item.Title" data-category="@item.CategoryName" data-totalslides="@item.TotalSlides">
+                                    <i class="bi bi-images me-1"></i> Xem trước bộ slide (@item.TotalSlides trang)
+                                </button>
+                                <!-- Nút Sử dụng mẫu để tạo bản trình chiếu mới -->
+                                <form asp-action="UseTemplate" asp-controller="Presentation" asp-route-id="@item.Id" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-warning btn-sm fw-bold shadow-sm w-100">
+                                        <i class="bi bi-plus-square-fill me-1"></i> Sử dụng mẫu này tạo Slide mới
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- ============================================== -->
+<!-- MODAL XEM TRƯỚC BỘ SLIDE (SLIDE GALLERY MODAL) -->
+<!-- ============================================== -->
+<div class="modal fade" id="modalSlidePreview" tabindex="-1" aria-labelledby="slidePreviewLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-easel2-fill text-warning fs-4"></i>
+                    <div>
+                        <h5 class="modal-title fw-bold" id="deckModalTitle">Bộ Mẫu Trình Chiếu</h5>
+                        <span class="badge bg-warning text-dark" id="deckModalCategory">Phân loại</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4 bg-light">
+                <div class="alert alert-info py-2 px-3 small d-flex align-items-center mb-3">
+                    <i class="bi bi-info-circle-fill fs-5 me-2"></i>
+                    <span>Duyệt qua các trang slide trong bộ template. Khi chọn sử dụng, hệ thống sẽ tạo một bản trình chiếu độc lập để bạn chỉnh sửa và tải file PPTX mà không ảnh hưởng tới mẫu gốc.</span>
+                </div>
+
+                <!-- Slide Gallery Carousel -->
+                <div id="slideCarousel" class="carousel slide" data-bs-ride="false">
+                    <div class="carousel-inner" id="carouselInnerContent">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-warning" role="status"></div>
+                            <p class="text-muted mt-2">Đang tải slide...</p>
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#slideCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                        <span class="visually-hidden">Trước</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#slideCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                        <span class="visually-hidden">Tiếp</span>
+                    </button>
+                </div>
+
+                <!-- Thumbnails Strip bên dưới -->
+                <div class="d-flex gap-2 overflow-x-auto py-3 px-1 mt-3 border-top" id="carouselThumbnails"></div>
+            </div>
+            <div class="modal-footer bg-white">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
+                <form id="formUseDeckModal" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-warning fw-bold px-4 shadow-sm">
+                        <i class="bi bi-pencil-square me-1"></i> Tạo bản trình chiếu mới từ bộ này
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================== -->
+<!-- MODAL THÊM BỘ TEMPLATE MỚI (ADD NEW DECK MODAL)-->
+<!-- ============================================== -->
+<div class="modal fade" id="modalCreateDeckTemplate" tabindex="-1" aria-labelledby="createDeckLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title fw-bold" id="createDeckLabel">
+                    <i class="bi bi-plus-circle-fill text-warning me-2"></i>Thêm Bộ Template PowerPoint Mới
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formCreateDeckTemplate">
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Mã bộ slide <span class="text-danger">*</span></label>
+                            <input type="text" id="newDeckCode" class="form-control" placeholder="VD: PPT-004" required />
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">Tên bộ slide <span class="text-danger">*</span></label>
+                            <input type="text" id="newDeckTitle" class="form-control" placeholder="VD: Corporate Annual Financial Report" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Phân loại danh mục <span class="text-danger">*</span></label>
+                            <select id="newDeckCategoryId" class="form-select" required>
+                                @foreach (var cat in Model.Categories)
+                                {
+                                    <option value="@cat.Id">@cat.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Thẻ từ khóa (Tags)</label>
+                            <input type="text" id="newDeckTags" class="form-control" placeholder="Tài chính, Báo cáo, Cổ đông, Doanh thu" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Mô tả tóm tắt bộ slide</label>
+                            <textarea id="newDeckDesc" class="form-control" rows="2" placeholder="Tóm tắt nội dung và mục đích của bộ slide..."></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Nội dung Slide trang bìa (Cover Slide)</label>
+                            <input type="text" id="newSlide1Title" class="form-control mb-2" placeholder="Tiêu đề Slide 1..." value="BÁO CÁO TÀI CHÍNH NĂM 2026" required />
+                            <textarea id="newSlide1Body" class="form-control" rows="2" placeholder="Nội dung/Phụ đề slide bìa...">Trình bày bởi Ban Tài Chính Doanh Nghiệp</textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Nội dung Slide nội dung chính (Content Slide)</label>
+                            <input type="text" id="newSlide2Title" class="form-control mb-2" placeholder="Tiêu đề Slide 2..." value="CHỈ SỐ TÀI CHÍNH TĂNG TRƯỞNG" required />
+                            <textarea id="newSlide2Body" class="form-control" rows="3" placeholder="Các gạch đầu dòng bullet points...">• Doanh thu thuần đạt 120 tỷ đồng, tăng 35% so với cùng kỳ.
+• Lợi nhuận trước thuế tăng trưởng 28%.
+• Mở rộng thị phần sang 3 quốc gia Đông Nam Á.</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-warning fw-bold px-4" id="btnSubmitNewDeck">
+                        <i class="bi bi-cloud-arrow-up-fill me-1"></i> Lưu Bộ Slide Mới
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/presentation-index.js" asp-append-version="true"></script>
+}

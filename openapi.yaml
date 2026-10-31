@@ -1,0 +1,432 @@
+openapi: 3.0.3
+info:
+  title: Template Management System API
+  version: 1.0.0
+  description: >-
+    API contract for the two local ASP.NET Core applications. Successful JSON
+    responses use {status, data, message}; file export endpoints return binary
+    Office documents. Public template GET endpoints do not require authentication.
+    All write operations and user document/deck endpoints require the corresponding
+    application cookie. Unsafe requests also require X-CSRF-TOKEN, obtained from
+    an account page. The applications do not currently host Swagger UI.
+servers:
+  - url: http://localhost:5001
+    description: Document templates
+tags:
+  - name: Documents
+  - name: Presentations
+paths:
+  /api/templates:
+    get:
+      tags: [Documents]
+      summary: Search document templates
+      parameters:
+        - name: categoryId
+          in: query
+          schema: { type: integer }
+        - name: keyword
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Document template list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse" }
+        "500": { $ref: "#/components/responses/ServerError" }
+    post:
+      tags: [Documents]
+      summary: Add a document template
+      security:
+        - documentCookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/CsrfToken"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateDocumentTemplate" }
+      responses:
+        "200":
+          description: Template created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/templates/{id}:
+    get:
+      tags: [Documents]
+      summary: Get a document template
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Document template
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/templates/{id}/documents:
+    post:
+      tags: [Documents]
+      summary: Create a user document from a template
+      security:
+        - documentCookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/CsrfToken"
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateFromTemplate" }
+      responses:
+        "201":
+          description: User document created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/documents/{id}:
+    get:
+      tags: [Documents]
+      summary: Get a user document
+      security:
+        - documentCookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: User document
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    put:
+      tags: [Documents]
+      summary: Save a user document
+      security:
+        - documentCookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+        - $ref: "#/components/parameters/CsrfToken"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SaveDocument" }
+      responses:
+        "200":
+          description: Document saved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/ServerError" }
+    delete:
+      tags: [Documents]
+      summary: Delete a user document
+      security:
+        - documentCookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+        - $ref: "#/components/parameters/CsrfToken"
+      responses:
+        "200":
+          description: Document deleted
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /api/documents/{id}/file:
+    get:
+      tags: [Documents]
+      summary: Export a DOCX file
+      security:
+        - documentCookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: DOCX document
+          content:
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
+              schema: { type: string, format: binary }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/presentations/templates:
+    get:
+      tags: [Presentations]
+      servers:
+        - url: http://localhost:5002
+      summary: Search presentation templates
+      parameters:
+        - name: categoryId
+          in: query
+          schema: { type: integer }
+        - name: keyword
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Presentation template list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse" }
+        "500": { $ref: "#/components/responses/ServerError" }
+    post:
+      tags: [Presentations]
+      servers:
+        - url: http://localhost:5002
+      summary: Add a presentation template
+      security:
+        - presentationCookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/CsrfToken"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreatePresentationTemplate" }
+      responses:
+        "200":
+          description: Template created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/presentations/templates/{id}:
+    get:
+      tags: [Presentations]
+      servers:
+        - url: http://localhost:5002
+      summary: Get a presentation template and its slides
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Presentation template
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /api/presentations/templates/{id}/decks:
+    post:
+      tags: [Presentations]
+      servers:
+        - url: http://localhost:5002
+      summary: Create a user deck from a template
+      security:
+        - presentationCookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+        - $ref: "#/components/parameters/CsrfToken"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateFromTemplate" }
+      responses:
+        "201":
+          description: Deck created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /api/presentations/decks/{id}:
+    get:
+      tags: [Presentations]
+      servers:
+        - url: http://localhost:5002
+      summary: Get a user deck
+      security:
+        - presentationCookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: User deck
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    put:
+      tags: [Presentations]
+      servers:
+        - url: http://localhost:5002
+      summary: Save a user deck
+      security:
+        - presentationCookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+        - $ref: "#/components/parameters/CsrfToken"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SaveDeck" }
+      responses:
+        "200":
+          description: Deck saved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/ServerError" }
+    delete:
+      tags: [Presentations]
+      servers:
+        - url: http://localhost:5002
+      summary: Delete a user deck
+      security:
+        - presentationCookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+        - $ref: "#/components/parameters/CsrfToken"
+      responses:
+        "200":
+          description: Deck deleted
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /api/presentations/decks/{id}/file:
+    get:
+      tags: [Presentations]
+      servers:
+        - url: http://localhost:5002
+      summary: Export a PPTX file
+      security:
+        - presentationCookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: PowerPoint file
+          content:
+            application/vnd.openxmlformats-officedocument.presentationml.presentation:
+              schema: { type: string, format: binary }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/ServerError" }
+components:
+  securitySchemes:
+    documentCookieAuth:
+      type: apiKey
+      in: cookie
+      name: .TemplateManagement.Document.Auth
+    presentationCookieAuth:
+      type: apiKey
+      in: cookie
+      name: .TemplateManagement.Presentation.Auth
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer, minimum: 1 }
+    CsrfToken:
+      name: X-CSRF-TOKEN
+      in: header
+      required: true
+      description: Anti-forgery token issued in the application account page.
+      schema: { type: string }
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        status: { type: integer }
+        data: {}
+        message: { type: string, nullable: true }
+    CreateDocumentTemplate:
+      type: object
+      required: [code, title, categoryId, contentHtml]
+      properties:
+        code: { type: string, maxLength: 50, pattern: "^[A-Za-z0-9_-]+$" }
+        title: { type: string, maxLength: 255 }
+        categoryId: { type: integer, minimum: 1 }
+        description: { type: string, nullable: true, maxLength: 4000 }
+        contentHtml: { type: string, maxLength: 500000 }
+        tags: { type: string, nullable: true, maxLength: 255 }
+        thumbnailUrl: { type: string, nullable: true }
+    CreateFromTemplate:
+      type: object
+      properties:
+        templateId: { type: integer }
+        customTitle: { type: string, nullable: true }
+        authorName: { type: string, nullable: true }
+    SaveDocument:
+      type: object
+      required: [id, documentTitle, contentHtml]
+      properties:
+        id: { type: integer, minimum: 1 }
+        documentTitle: { type: string, maxLength: 255 }
+        contentHtml: { type: string, maxLength: 500000 }
+        status: { type: string, maxLength: 50 }
+    Slide:
+      type: object
+      required: [slideNumber, slideTitle]
+      properties:
+        slideNumber: { type: integer, minimum: 1, maximum: 1000 }
+        slideTitle: { type: string, maxLength: 255 }
+        subtitle: { type: string, nullable: true, maxLength: 255 }
+        contentBody: { type: string, nullable: true, maxLength: 10000 }
+        notes: { type: string, nullable: true, maxLength: 10000 }
+        layoutType: { type: string, maxLength: 50 }
+    CreatePresentationTemplate:
+      type: object
+      required: [code, title, categoryId, slides]
+      properties:
+        code: { type: string, maxLength: 50, pattern: "^[A-Za-z0-9_-]+$" }
+        title: { type: string, maxLength: 255 }
+        categoryId: { type: integer, minimum: 1 }
+        description: { type: string, nullable: true, maxLength: 4000 }
+        tags: { type: string, nullable: true, maxLength: 255 }
+        slides:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items: { $ref: "#/components/schemas/Slide" }
+    SaveDeck:
+      type: object
+      required: [id, deckTitle, slides]
+      properties:
+        id: { type: integer, minimum: 1 }
+        deckTitle: { type: string, maxLength: 255 }
+        slides:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items: { $ref: "#/components/schemas/Slide" }
+        status: { type: string, maxLength: 50 }
+    ErrorResponse:
+      allOf:
+        - $ref: "#/components/schemas/ApiResponse"
+        - type: object
+          properties:
+            data: { type: object, nullable: true }
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    ServerError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
